@@ -8,9 +8,15 @@ load_dotenv()
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'your-secret-key-here-change-in-production'
     
-    # Database path - relative to backend folder
-    db_path = os.path.join(os.path.dirname(__file__), 'instance', 'churn_app.db')
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or f'sqlite:///{db_path}'
+    # Database configuration - Use PostgreSQL for production, SQLite for development
+    if os.environ.get('DATABASE_URL'):
+        # Production database (PostgreSQL on Render)
+        SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL').replace('postgres://', 'postgresql://')
+    else:
+        # Development database (SQLite)
+        db_path = os.path.join(os.path.dirname(__file__), 'instance', 'churn_app.db')
+        SQLALCHEMY_DATABASE_URI = f'sqlite:///{db_path}'
+    
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     PERMANENT_SESSION_LIFETIME = timedelta(hours=2)
     
