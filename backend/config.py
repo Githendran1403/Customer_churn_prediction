@@ -8,12 +8,12 @@ load_dotenv()
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'your-secret-key-here-change-in-production'
     
-    # Database configuration - Use PostgreSQL for production, SQLite for development
+    # Database configuration - Force in-memory SQLite for Render deployment
     if os.environ.get('DATABASE_URL'):
         # Production database (PostgreSQL on Render)
         SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL').replace('postgres://', 'postgresql://')
-    elif os.environ.get('FLASK_ENV') == 'production':
-        # Production fallback - use in-memory SQLite (temporary)
+    elif os.environ.get('PORT'):  # Render sets PORT environment variable
+        # Production on Render - use in-memory SQLite (temporary)
         SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
     else:
         # Development database (SQLite)
