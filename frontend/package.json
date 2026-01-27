@@ -1,0 +1,48 @@
+{
+  "name": "customer-churn-prediction-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for Customer Churn Prediction System - Indian Edition",
+  "main": "static/js/main.js",
+  "scripts": {
+    "dev": "echo 'Frontend development server - use Flask backend'",
+    "build": "echo 'No build process needed for current setup'",
+    "lint": "echo 'Add ESLint configuration for linting'",
+    "format": "echo 'Add Prettier configuration for formatting'"
+  },
+  "keywords": [
+    "customer-churn",
+    "machine-learning",
+    "indian-business",
+    "flask-frontend",
+    "bootstrap",
+    "plotly",
+    "responsive-design"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "bootstrap": "^5.3.0",
+    "plotly.js": "^2.26.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "prettier": "^3.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/customer-churn-frontend.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/customer-churn-frontend/issues"
+  },
+  "homepage": "https://github.com/yourusername/customer-churn-frontend#readme",
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  }
+}

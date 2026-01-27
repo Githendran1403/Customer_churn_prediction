@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <h1><i class="fas fa-chart-line me-3"></i>Smart Customer Churn Predictor</h1>
+        <p class="lead">Predict customer churn with advanced machine learning algorithms designed for Indian businesses</p>
+        {% if not current_user.is_authenticated %}
+            <div class="mt-4">
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg me-3">
+                    <i class="fas fa-user-plus me-2"></i>Get Started
+                </a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary btn-lg">
+                    <i class="fas fa-sign-in-alt me-2"></i>Login
+                </a>
+            </div>
+        {% else %}
+            <div class="mt-4">
+                <a href="{{ url_for('main.predict') }}" class="btn btn-primary btn-lg me-3">
+                    <i class="fas fa-brain me-2"></i>Make Prediction
+                </a>
+                <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-primary btn-lg">
+                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-brain fa-3x text-primary"></i>
+                        </div>
+                        <h5 class="card-title">AI-Powered Predictions</h5>
+                        <p class="card-text">Advanced machine learning algorithms analyze Indian customer behavior patterns to predict churn probability with high accuracy. Specially trained on Indian telecom, banking, and e-commerce data.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-chart-bar fa-3x text-success"></i>
+                        </div>
+                        <h5 class="card-title">Interactive Dashboard</h5>
+                        <p class="card-text">Visualize prediction trends, model performance metrics, and customer insights through beautiful, interactive charts. All amounts displayed in Indian Rupees (₹).</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-history fa-3x text-info"></i>
+                        </div>
+                        <h5 class="card-title">Prediction History</h5>
+                        <p class="card-text">Track all your predictions over time, analyze patterns, and export data for further business intelligence. Supports Indian business contexts and regional preferences.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+{% if current_user.is_authenticated %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5">Your Statistics</h2>
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="stats-card">
+                    <div class="stats-number text-primary">{{ user_stats.total_predictions }}</div>
+                    <div class="stats-label">Total Predictions</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="stats-card">
+                    <div class="stats-number text-danger">{{ user_stats.churn_predictions }}</div>
+                    <div class="stats-label">Churn Predictions</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="stats-card">
+                    <div class="stats-number text-success">{{ user_stats.no_churn_predictions }}</div>
+                    <div class="stats-label">No Churn Predictions</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="stats-card">
+                    <div class="stats-number text-info">{{ "%.1f"|format(user_stats.avg_probability * 100) }}%</div>
+                    <div class="stats-label">Avg Churn Probability</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- How It Works Section -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">How It Works</h2>
+        <div class="row">
+            <div class="col-lg-3 mb-4 text-center">
+                <div class="mb-3">
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                        <span class="fw-bold">1</span>
+                    </div>
+                </div>
+                <h5>Input Customer Data</h5>
+                <p>Enter customer information including tenure, charges in ₹, contract type, and payment method including UPI, Net Banking, and digital wallets.</p>
+            </div>
+            
+            <div class="col-lg-3 mb-4 text-center">
+                <div class="mb-3">
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                        <span class="fw-bold">2</span>
+                    </div>
+                </div>
+                <h5>AI Analysis</h5>
+                <p>Our trained machine learning model analyzes the data using advanced algorithms optimized for Indian customer behavior patterns.</p>
+            </div>
+            
+            <div class="col-lg-3 mb-4 text-center">
+                <div class="mb-3">
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                        <span class="fw-bold">3</span>
+                    </div>
+                </div>
+                <h5>Get Prediction</h5>
+                <p>Receive instant churn probability prediction with confidence score, helping you understand customer retention likelihood.</p>
+            </div>
+            
+            <div class="col-lg-3 mb-4 text-center">
+                <div class="mb-3">
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                        <span class="fw-bold">4</span>
+                    </div>
+                </div>
+                <h5>Take Action</h5>
+                <p>Use insights to implement retention strategies suitable for Indian market and reduce customer churn effectively.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

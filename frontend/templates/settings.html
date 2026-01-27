@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - Customer Churn Prediction{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h1><i class="fas fa-cog me-3"></i>User Settings</h1>
+            <p class="text-muted">Manage your account preferences and information</p>
+
+            <!-- Account Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-user me-2"></i>Account Information
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Username:</strong><br>
+                            {{ current_user.username }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Email:</strong><br>
+                            {{ current_user.email }}
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <strong>Role:</strong><br>
+                            <span class="badge badge-{{ 'danger' if current_user.is_admin() else 'primary' }}">
+                                {{ current_user.role.title() }}
+                            </span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Member Since:</strong><br>
+                            {{ current_user.created_at.strftime('%B %d, %Y') }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Usage Statistics -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-chart-bar me-2"></i>Your Usage Statistics
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 text-center">
+                            <h4 class="text-primary">{{ user_stats.total_predictions }}</h4>
+                            <p class="text-muted">Total Predictions</p>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <h4 class="text-danger">{{ user_stats.churn_predictions }}</h4>
+                            <p class="text-muted">Churn Predictions</p>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <h4 class="text-success">{{ user_stats.no_churn_predictions }}</h4>
+                            <p class="text-muted">No Churn Predictions</p>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <h4 class="text-info">{{ "%.1f"|format(user_stats.avg_probability * 100) }}%</h4>
+                            <p class="text-muted">Avg Churn Probability</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Change Password -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-lock me-2"></i>Change Password
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('main.change_password') }}">
+                        <div class="form-group">
+                            <label class="form-label">Current Password</label>
+                            <input type="password" name="current_password" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">New Password</label>
+                            <input type="password" name="new_password" class="form-control" required minlength="6">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Confirm New Password</label>
+                            <input type="password" name="confirm_password" class="form-control" required minlength="6">
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Update Password
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Data Export -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-download me-2"></i>Data Export
+                </div>
+                <div class="card-body">
+                    <p>Export all your prediction data for analysis or backup purposes.</p>
+                    <a href="{{ url_for('main.export_data') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-file-csv me-2"></i>Export All Predictions (CSV)
+                    </a>
+                </div>
+            </div>
+
+            <!-- Danger Zone -->
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Danger Zone
+                </div>
+                <div class="card-body">
+                    <h6>Delete Account</h6>
+                    <p class="text-muted">
+                        Permanently delete your account and all associated data. This action cannot be undone.
+                    </p>
+                    <button class="btn btn-danger" onclick="confirmDeleteAccount()">
+                        <i class="fas fa-trash me-2"></i>Delete Account
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Account Modal -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Confirm Account Deletion</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Are you sure you want to delete your account?</strong></p>
+                <p>This will permanently delete:</p>
+                <ul>
+                    <li>Your account information</li>
+                    <li>All your prediction history</li>
+                    <li>All associated data</li>
+                </ul>
+                <p class="text-danger"><strong>This action cannot be undone!</strong></p>
+                
+                <form method="POST" action="{{ url_for('main.delete_account') }}" id="deleteAccountForm">
+                    <div class="form-group">
+                        <label class="form-label">Type your username to confirm:</label>
+                        <input type="text" name="username_confirm" class="form-control" required 
+                               placeholder="{{ current_user.username }}">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" form="deleteAccountForm" class="btn btn-danger">
+                    <i class="fas fa-trash me-2"></i>Delete Account
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function confirmDeleteAccount() {
+    const modal = new bootstrap.Modal(document.getElementById('deleteAccountModal'));
+    modal.show();
+}
+
+// Validate username confirmation
+document.getElementById('deleteAccountForm').addEventListener('submit', function(e) {
+    const usernameConfirm = document.querySelector('input[name="username_confirm"]').value;
+    const actualUsername = '{{ current_user.username }}';
+    
+    if (usernameConfirm !== actualUsername) {
+        e.preventDefault();
+        showAlert('Username confirmation does not match', 'danger');
+    }
+});
+</script>
+{% endblock %}

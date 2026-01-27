@@ -1,0 +1,334 @@
+{% extends "base.html" %} {% block title %}Bulk Predictions - Customer Churn
+Prediction{% endblock %} {% block content %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <!-- Header -->
+      <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">
+            <i class="fas fa-upload me-2"></i>Bulk Predictions
+          </h4>
+        </div>
+        <div class="card-body">
+          <p class="text-muted">
+            Upload a CSV file to make predictions for multiple customers at
+            once.
+          </p>
+        </div>
+      </div>
+
+      <!-- Upload Form -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-file-csv me-2"></i>Upload CSV File
+          </h5>
+        </div>
+        <div class="card-body">
+          <form method="POST" enctype="multipart/form-data">
+            <div class="form-group mb-3">
+              <label for="csv_file" class="form-label">Choose CSV File</label>
+              <input
+                type="file"
+                class="form-control"
+                id="csv_file"
+                name="csv_file"
+                accept=".csv"
+                required
+              />
+              <small class="form-text text-muted">
+                CSV file must contain columns: customer_name, tenure,
+                monthly_charges, total_charges, contract_type, payment_method
+              </small>
+            </div>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-cloud-upload-alt me-2"></i>Upload & Process
+            </button>
+            <a
+              href="{{ url_for('main.index') }}"
+              class="btn btn-outline-secondary ms-2"
+              >Cancel</a
+            >
+          </form>
+        </div>
+      </div>
+
+      <!-- CSV Format Guide -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-info-circle me-2"></i>CSV Format Guide
+          </h5>
+        </div>
+        <div class="card-body">
+          <p><strong>Required Columns:</strong></p>
+          <table class="table table-sm table-bordered">
+            <thead>
+              <tr class="table-light">
+                <th>Column Name</th>
+                <th>Description</th>
+                <th>Example</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>customer_name</code></td>
+                <td>Customer name or ID</td>
+                <td>John Doe</td>
+              </tr>
+              <tr>
+                <td><code>tenure</code></td>
+                <td>Number of months with company</td>
+                <td>12</td>
+              </tr>
+              <tr>
+                <td><code>monthly_charges</code></td>
+                <td>Monthly charges in ₹ (Rupees)</td>
+                <td>2500</td>
+              </tr>
+              <tr>
+                <td><code>total_charges</code></td>
+                <td>Total charges to date in ₹ (Rupees)</td>
+                <td>30000</td>
+              </tr>
+              <tr>
+                <td><code>contract_type</code></td>
+                <td>Contract type (Month-to-month, One year, Two year)</td>
+                <td>Two year</td>
+              </tr>
+              <tr>
+                <td><code>payment_method</code></td>
+                <td>Payment method</td>
+                <td>Credit card (automatic)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="alert alert-info mt-3">
+            <strong>Example CSV:</strong>
+            <pre>
+customer_name,tenure,monthly_charges,total_charges,contract_type,payment_method
+John Doe,12,2500,30000,Two year,Credit card (automatic)
+Jane Smith,2,3500,7000,Month-to-month,Electronic check
+Bob Johnson,36,1800,64800,Two year,Bank transfer (automatic)</pre
+            >
+          </div>
+
+          <p class="mt-3">
+            <a
+              href="#"
+              onclick="downloadSampleCSV()"
+              class="btn btn-sm btn-outline-primary"
+            >
+              <i class="fas fa-download me-1"></i>Download Sample CSV
+            </a>
+          </p>
+        </div>
+      </div>
+
+      <!-- Results Section -->
+      {% if results %}
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-check-circle me-2"></i>Processing Results
+            <span class="badge bg-success float-end"
+              >{{ success_count }} Success</span
+            >
+            {% if error_count > 0 %}
+            <span class="badge bg-danger">{{ error_count }} Failed</span>
+            {% endif %}
+          </h5>
+        </div>
+        <div class="card-body">
+          <!-- Summary Stats -->
+          <div class="row mb-4">
+            <div class="col-md-3">
+              <div class="stats-card text-center">
+                <div class="stats-number" style="color: #059669">
+                  {{ success_count }}
+                </div>
+                <div class="stats-label">Successful</div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stats-card text-center">
+                <div class="stats-number" style="color: #dc2626">
+                  {{ error_count }}
+                </div>
+                <div class="stats-label">Failed</div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stats-card text-center">
+                <div class="stats-number" style="color: #2563eb">
+                  {{ results|length }}
+                </div>
+                <div class="stats-label">Total Processed</div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stats-card text-center">
+                <div class="stats-number" style="color: #059669">
+                  {{ "%.1f"|format(success_count / results|length * 100) if
+                  results else 0 }}%
+                </div>
+                <div class="stats-label">Success Rate</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Results Table -->
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Row</th>
+                  <th>Customer Name</th>
+                  <th>Status</th>
+                  <th>Prediction</th>
+                  <th>Risk Score</th>
+                  <th>Probability</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for result in results %}
+                <tr>
+                  <td>{{ result.row }}</td>
+                  <td>{{ result.name }}</td>
+                  <td>
+                    {% if result.status == 'success' %}
+                    <span class="badge bg-success"
+                      ><i class="fas fa-check me-1"></i>Success</span
+                    >
+                    {% else %}
+                    <span class="badge bg-danger"
+                      ><i class="fas fa-times me-1"></i>Error</span
+                    >
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if result.status == 'success' %} {% if result.prediction
+                    == 'Churn' %}
+                    <span class="badge bg-danger">{{ result.prediction }}</span>
+                    {% else %}
+                    <span class="badge bg-success"
+                      >{{ result.prediction }}</span
+                    >
+                    {% endif %} {% else %} — {% endif %}
+                  </td>
+                  <td>
+                    {% if result.status == 'success' %}
+                    <span
+                      class="badge"
+                      style="background-color: {% if result.risk_score >= 70 %}#dc2626{% elif result.risk_score >= 40 %}#d97706{% else %}#059669{% endif %};"
+                    >
+                      {{ result.risk_score }}/100
+                    </span>
+                    {% else %} — {% endif %}
+                  </td>
+                  <td>
+                    {% if result.status == 'success' %} {{ result.probability }}
+                    {% else %}
+                    <small class="text-danger">{{ result.error }}</small>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="mt-3">
+            <a href="{{ url_for('main.history') }}" class="btn btn-primary">
+              <i class="fas fa-history me-1"></i>View All Predictions
+            </a>
+            <a
+              href="{{ url_for('main.bulk_predict') }}"
+              class="btn btn-outline-primary"
+            >
+              <i class="fas fa-redo me-1"></i>Import Another File
+            </a>
+          </div>
+
+          <!-- Email Sharing Section -->
+          {% if success_count > 0 %}
+          <div class="mt-4 p-3" style="background-color: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+            <h6><i class="fas fa-envelope me-2"></i>Share Bulk Report</h6>
+            <p class="text-muted mb-3">Send the bulk prediction report to stakeholders via email</p>
+            
+            <form method="POST" action="{{ url_for('main.send_bulk_email') }}" class="row g-3">
+              <div class="col-md-6">
+                <label for="bulk_recipient_email" class="form-label">Recipient Email</label>
+                <input type="email" class="form-control" id="bulk_recipient_email" name="recipient_email" 
+                       placeholder="manager@company.com" required>
+              </div>
+              
+              <div class="col-md-6">
+                <label for="bulk_sender_name" class="form-label">Your Name</label>
+                <input type="text" class="form-control" id="bulk_sender_name" name="sender_name" 
+                       value="{{ current_user.username }}" placeholder="Your Name">
+              </div>
+              
+              <div class="col-12">
+                <button type="submit" class="btn btn-success">
+                  <i class="fas fa-paper-plane me-2"></i>Send Bulk Report Email
+                </button>
+                <small class="text-muted ms-3">
+                  Will include {{ success_count }} successful predictions
+                </small>
+              </div>
+            </form>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<script>
+  function downloadSampleCSV() {
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      encodeURIComponent(`customer_name,tenure,monthly_charges,total_charges,contract_type,payment_method
+John Doe,12,2500,30000,Two year,Credit card (automatic)
+Jane Smith,2,3500,7000,Month-to-month,Electronic check
+Bob Johnson,36,1800,64800,Two year,Bank transfer (automatic)
+Alice Brown,6,2800,16800,One year,Automatic bank transfer
+Charlie Wilson,24,2200,52800,Two year,Credit card (automatic)`);
+
+    const link = document.createElement("a");
+    link.setAttribute("href", csvContent);
+    link.setAttribute("download", "sample_predictions.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+</script>
+
+<style>
+  .stats-card {
+    background: var(--bg-card);
+    border-radius: 8px;
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+
+  .stats-number {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .stats-label {
+    color: var(--text-secondary);
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+</style>
+{% endblock %}

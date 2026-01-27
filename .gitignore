@@ -1,0 +1,213 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+venv/
+ENV/
+env/
+.venv
+env.bak/
+venv.bak/
+
+# Flask
+instance/
+.webassets-cache
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+churn_app.db
+backend/instance/churn_app.db
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.project
+.pydevproject
+.settings/
+*.sublime-project
+*.sublime-workspace
+.atom/
+.vscode-test/
+
+# Editor
+.vs/
+.vim/
+
+# OS
+.DS_Store
+Thumbs.db
+*.log
+*.pot
+
+# Testing
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# Machine Learning Models
+*.pkl
+*.joblib
+*.h5
+*.model
+*.pth
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+.env.prod
+.env.dev
+
+# Node (if using npm for frontend)
+node_modules/
+package-lock.json
+npm-debug.log
+
+# Frontend Build
+dist/
+build/
+
+# Temporary Files
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+
+# OS-specific
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Python
+*.pyc
+*.pyo
+
+# Dependencies
+requirements-local.txt
+
+# Flask session files
+flask_session/
+
+# Uploaded files
+uploads/
+temp/
+
+# Configuration (if needed)
+config.local.py
+
+# Documentation build files
+docs/_build/
+
+# Coverage reports
+htmlcov/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# Profiling
+*.prof
+*.lprof
+
+# Debug
+.debug/
+
+# SSL certificates
+*.pem
+*.crt
+*.key
+
+# Sensitive data
+secrets.json
+credentials.json
+api_keys.txt
+
+# Backup files
+*.backup
+*.bkp
+
+# Lock files (optional - uncomment if you want to version control)
+# poetry.lock
+# Pipfile.lock
+
+# IDE
+.vscode/settings.json
+.vscode/launch.json
+
+# OS
+.env.example.local
+
+# Project specific
+*.csv (if not versioning test data)
+experiments/
+data/raw/
+data/processed/
+
+# Git
+.git/
+.gitignore_global
+
+# Byte-compiled
+__pycache__/
+*.py[cod]
+
+# Logs
+*.log
+
+# Database backups
+*.db-journal
+*.db-wal
+# Testing and demo files
+test_*.py
+*_test.py
+demo_*.py
+setup_*.py
+*test*.py
+EMAIL_*.md

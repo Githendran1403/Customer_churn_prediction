@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Customer Churn Prediction{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h1><i class="fas fa-tachometer-alt me-3"></i>Dashboard</h1>
+            <p class="text-muted">Overview of your churn predictions and system performance</p>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-5">
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stats-card">
+                <div class="stats-number text-primary">{{ stats.total_predictions }}</div>
+                <div class="stats-label">Total Predictions</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stats-card">
+                <div class="stats-number text-danger">{{ stats.churn_predictions }}</div>
+                <div class="stats-label">Churn Predictions</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stats-card">
+                <div class="stats-number text-success">{{ stats.no_churn_predictions }}</div>
+                <div class="stats-label">No Churn Predictions</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stats-card">
+                <div class="stats-number text-info">{{ "%.1f"|format(stats.avg_probability * 100) }}%</div>
+                <div class="stats-label">Avg Churn Probability</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-5">
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-chart-pie me-2"></i>Prediction Distribution
+                </div>
+                <div class="card-body">
+                    <div id="prediction-distribution" style="height: 300px;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-chart-line me-2"></i>Monthly Trend
+                </div>
+                <div class="card-body">
+                    <div id="monthly-trend" style="height: 300px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Model Performance -->
+    {% if model_metrics %}
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-cogs me-2"></i>Model Performance Metrics
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 text-center">
+                            <h4 class="text-primary">{{ "%.2f"|format(model_metrics.accuracy * 100) }}%</h4>
+                            <p class="text-muted">Accuracy</p>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <h4 class="text-success">{{ "%.2f"|format(model_metrics.precision * 100) }}%</h4>
+                            <p class="text-muted">Precision</p>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <h4 class="text-info">{{ "%.2f"|format(model_metrics.recall * 100) }}%</h4>
+                            <p class="text-muted">Recall</p>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <h4 class="text-warning">{{ "%.2f"|format(model_metrics.f1_score * 100) }}%</h4>
+                            <p class="text-muted">F1 Score</p>
+                        </div>
+                    </div>
+                    <small class="text-muted">Last updated: {{ model_metrics.updated_at.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Recent Predictions -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-history me-2"></i>Recent Predictions</span>
+                    <a href="{{ url_for('main.history') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if recent_predictions %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Customer</th>
+                                        <th>Prediction</th>
+                                        <th>Probability</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for prediction in recent_predictions %}
+                                    <tr>
+                                        <td>{{ prediction.customer_name }}</td>
+                                        <td>
+                                            {% if prediction.prediction == 1 %}
+                                                <span class="badge badge-danger">Churn</span>
+                                            {% else %}
+                                                <span class="badge badge-success">No Churn</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ "%.1f"|format(prediction.probability * 100) }}%</td>
+                                        <td>{{ prediction.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-info" onclick="viewPredictionDetails({{ prediction.id }})">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No predictions yet</h5>
+                            <p class="text-muted">Start by making your first prediction</p>
+                            <a href="{{ url_for('main.predict') }}" class="btn btn-primary">
+                                <i class="fas fa-brain me-2"></i>Make Prediction
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Prediction Details Modal -->
+<div class="modal fade" id="predictionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Prediction Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="predictionModalBody">
+                <!-- Content loaded via JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function viewPredictionDetails(predictionId) {
+    fetch(`/api/prediction/${predictionId}`)
+        .then(response => response.json())
+        .then(data => {
+            const modalBody = document.getElementById('predictionModalBody');
+            modalBody.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong>Customer Name:</strong><br>
+                        ${data.customer_name}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Prediction:</strong><br>
+                        <span class="badge badge-${data.prediction == 1 ? 'danger' : 'success'}">
+                            ${data.prediction == 1 ? 'Churn' : 'No Churn'}
+                        </span>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong>Tenure:</strong> ${data.tenure} months<br>
+                        <strong>Monthly Charges:</strong> ₹${data.monthly_charges.toLocaleString('en-IN')}<br>
+                        <strong>Total Charges:</strong> ₹${data.total_charges.toLocaleString('en-IN')}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Contract Type:</strong> ${data.contract_type}<br>
+                        <strong>Payment Method:</strong> ${data.payment_method}<br>
+                        <strong>Churn Probability:</strong> ${(data.probability * 100).toFixed(1)}%
+                    </div>
+                </div>
+                <hr>
+                <small class="text-muted">Predicted on: ${data.created_at}</small>
+            `;
+            
+            const modal = new bootstrap.Modal(document.getElementById('predictionModal'));
+            modal.show();
+        })
+        .catch(error => {
+            console.error('Error loading prediction details:', error);
+            showAlert('Error loading prediction details', 'danger');
+        });
+}
+
+// Refresh charts when dark mode is toggled
+function refreshDashboardCharts() {
+    if (typeof Plotly !== "undefined") {
+        initializeDashboardCharts();
+    }
+}
+</script>
+{% endblock %}

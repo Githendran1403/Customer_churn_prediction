@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block title %}Email Feature Demo - ChurnPredict India{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">📧 Email Feature Demo</h4>
+                </div>
+                <div class="card-body">
+                    <p>This page shows exactly what the email sharing feature looks like after making a prediction.</p>
+                </div>
+            </div>
+
+            <!-- Simulated Prediction Result -->
+            <div class="prediction-result churn">
+                <div class="prediction-icon">
+                    <i class="fas fa-exclamation-triangle text-danger"></i>
+                </div>
+                <div class="prediction-text">
+                    Customer is likely to CHURN
+                </div>
+                <div class="prediction-probability">
+                    Churn Probability: 78.5%
+                </div>
+
+                <!-- Risk Score Badge -->
+                <div class="mt-2">
+                    <span class="badge" style="font-size: 1rem; padding: 0.5rem 1rem; background-color: #dc2626; color: white;">
+                        Risk Score: 85/100
+                    </span>
+                </div>
+
+                <!-- Recommendation -->
+                <div class="mt-3">
+                    <h6>Recommendation:</h6>
+                    <p class="mb-0">
+                        <strong>High churn risk detected!</strong> Consider implementing
+                        retention strategies such as: <br />• Personalized offers or
+                        discounts <br />• Improved customer service outreach <br />•
+                        Contract renegotiation <br />• Service upgrades or additional
+                        benefits
+                    </p>
+                </div>
+
+                <!-- Email Sharing Section - THIS IS THE EMAIL FEATURE! -->
+                <div class="mt-4 p-3" style="background-color: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <h6><i class="fas fa-envelope me-2"></i>Share Prediction Report</h6>
+                    <p class="text-muted mb-3">Send this prediction report to stakeholders via email</p>
+                    
+                    <form method="POST" action="#" class="row g-3" onsubmit="showEmailDemo(event)">
+                        <input type="hidden" name="prediction_id" value="123">
+                        
+                        <div class="col-md-6">
+                            <label for="recipient_email" class="form-label">Recipient Email</label>
+                            <input type="email" class="form-control" id="recipient_email" name="recipient_email" 
+                                   placeholder="manager@company.com" required>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="sender_name" class="form-label">Your Name</label>
+                            <input type="text" class="form-control" id="sender_name" name="sender_name" 
+                                   value="{{ current_user.username if current_user.is_authenticated else 'Demo User' }}" placeholder="Your Name">
+                        </div>
+                        
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-2"></i>Send Email Report
+                            </button>
+                            <small class="text-muted ms-3">
+                                Professional HTML email will be sent with prediction details
+                            </small>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Explanation -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">📍 This is where you'll find the email feature!</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-info-circle me-2"></i>How to access this feature:</h6>
+                        <ol>
+                            <li>Go to the <strong>Predict</strong> page</li>
+                            <li>Fill out the prediction form with customer data</li>
+                            <li>Click <strong>"Predict"</strong></li>
+                            <li>After getting the prediction result, <strong>scroll down</strong></li>
+                            <li>You'll see the gray box above with the email form</li>
+                            <li>Enter recipient email and click <strong>"Send Email Report"</strong></li>
+                        </ol>
+                    </div>
+
+                    <div class="alert alert-success">
+                        <h6><i class="fas fa-check-circle me-2"></i>What the email contains:</h6>
+                        <ul class="mb-0">
+                            <li>Professional ChurnPredict India branding</li>
+                            <li>Customer details and prediction results</li>
+                            <li>Risk scores and probability analysis</li>
+                            <li>Actionable recommendations</li>
+                            <li>Indian Rupee (₹) formatting</li>
+                            <li>Responsive HTML design</li>
+                        </ul>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <h6><i class="fas fa-cog me-2"></i>Email Setup Required:</h6>
+                        <p class="mb-0">
+                            To send actual emails, configure your email settings in environment variables:
+                            <code>MAIL_USERNAME</code> and <code>MAIL_PASSWORD</code>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="text-center mt-4">
+                <a href="{{ url_for('main.predict') }}" class="btn btn-primary me-2">
+                    <i class="fas fa-brain me-2"></i>Try Real Prediction
+                </a>
+                <a href="{{ url_for('main.bulk_predict') }}" class="btn btn-success">
+                    <i class="fas fa-upload me-2"></i>Try Bulk Predictions
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Demo Modal -->
+<div class="modal fade" id="emailDemoModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">📧 Email Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; background-color: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                    <div style="background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+                        <div style="font-size: 28px; font-weight: bold; margin-bottom: 10px;">📊 ChurnPredict India</div>
+                        <div style="font-size: 16px; opacity: 0.9;">AI-Powered Customer Retention Analytics</div>
+                    </div>
+                    
+                    <div style="padding: 30px;">
+                        <h2>Customer Churn Prediction Report</h2>
+                        
+                        <div style="text-align: center; padding: 20px; margin: 20px 0; border-radius: 8px; border: 2px solid #dc2626; background-color: rgba(220, 38, 38, 0.1);">
+                            <div style="font-size: 24px; font-weight: bold; color: #dc2626; margin-bottom: 10px;">Likely to Churn</div>
+                            <div style="font-size: 18px; color: #64748b;">Churn Probability: 78.5%</div>
+                        </div>
+                        
+                        <h3>Customer Details</h3>
+                        <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                            <tr><th style="padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; background-color: #f1f5f9; font-weight: 600;">Customer Name</th><td style="padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0;">Rajesh Kumar</td></tr>
+                            <tr><th style="padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; background-color: #f1f5f9; font-weight: 600;">Tenure</th><td style="padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0;">12 months</td></tr>
+                            <tr><th style="padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; background-color: #f1f5f9; font-weight: 600;">Monthly Charges</th><td style="padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0;">₹2,500</td></tr>
+                            <tr><th style="padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; background-color: #f1f5f9; font-weight: 600;">Total Charges</th><td style="padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0;">₹30,000</td></tr>
+                        </table>
+                        
+                        <div style="background-color: #eff6ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                            <h4 style="color: #1e40af; margin-top: 0;">💡 Recommendations</h4>
+                            <ul style="color: #374151; line-height: 1.6;">
+                                <li>High churn risk - Consider immediate retention strategies</li>
+                                <li>Offer personalized discounts or service upgrades</li>
+                                <li>Schedule a customer satisfaction call</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div style="background-color: #f8fafc; padding: 20px; text-align: center; border-radius: 0 0 8px 8px; color: #64748b; font-size: 14px;">
+                        <p>This report was generated by ChurnPredict India's AI-powered analytics platform.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showEmailDemo(event) {
+    event.preventDefault();
+    
+    const email = document.getElementById('recipient_email').value;
+    const name = document.getElementById('sender_name').value;
+    
+    if (!email) {
+        alert('Please enter a recipient email address');
+        return;
+    }
+    
+    // Show modal with email preview
+    const modal = new bootstrap.Modal(document.getElementById('emailDemoModal'));
+    modal.show();
+    
+    // Show success message
+    setTimeout(() => {
+        modal.hide();
+        alert(`✅ Demo: Email would be sent to ${email}\n\nIn real usage, a professional HTML email with ChurnPredict India branding would be sent with the complete prediction report!`);
+    }, 3000);
+}
+</script>
+{% endblock %}

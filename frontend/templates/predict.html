@@ -1,0 +1,281 @@
+{% extends "base.html" %} {% block title %}Make Prediction - Customer Churn
+Prediction{% endblock %} {% block content %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header text-center">
+          <i class="fas fa-brain me-2"></i>Customer Churn Prediction
+        </div>
+        <div class="card-body">
+          <form
+            method="POST"
+            id="prediction-form"
+            class="needs-validation"
+            novalidate
+          >
+            {{ form.hidden_tag() }}
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  {{ form.customer_name.label(class="form-label") }} {{
+                  form.customer_name(class="form-control" + (" is-invalid" if
+                  form.customer_name.errors else "")) }} {% if
+                  form.customer_name.errors %}
+                  <div class="invalid-feedback">
+                    {% for error in form.customer_name.errors %} {{ error }} {%
+                    endfor %}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-group">
+                  {{ form.tenure.label(class="form-label") }} {{
+                  form.tenure(class="form-control" + (" is-invalid" if
+                  form.tenure.errors else "")) }} {% if form.tenure.errors %}
+                  <div class="invalid-feedback">
+                    {% for error in form.tenure.errors %} {{ error }} {% endfor
+                    %}
+                  </div>
+                  {% endif %}
+                  <small class="form-text text-muted"
+                    >Number of months the customer has been with the
+                    company</small
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  {{ form.monthly_charges.label(class="form-label") }} {{
+                  form.monthly_charges(class="form-control" + (" is-invalid" if
+                  form.monthly_charges.errors else "")) }} {% if
+                  form.monthly_charges.errors %}
+                  <div class="invalid-feedback">
+                    {% for error in form.monthly_charges.errors %} {{ error }}
+                    {% endfor %}
+                  </div>
+                  {% endif %}
+                  <small class="form-text text-muted"
+                    >Monthly charges in ₹ (Rupees)</small
+                  >
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-group">
+                  {{ form.total_charges.label(class="form-label") }} {{
+                  form.total_charges(class="form-control" + (" is-invalid" if
+                  form.total_charges.errors else "")) }} {% if
+                  form.total_charges.errors %}
+                  <div class="invalid-feedback">
+                    {% for error in form.total_charges.errors %} {{ error }} {%
+                    endfor %}
+                  </div>
+                  {% endif %}
+                  <small class="form-text text-muted"
+                    >Total charges to date in ₹ (Rupees)</small
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  {{ form.contract_type.label(class="form-label") }} {{
+                  form.contract_type(class="form-select" + (" is-invalid" if
+                  form.contract_type.errors else "")) }} {% if
+                  form.contract_type.errors %}
+                  <div class="invalid-feedback">
+                    {% for error in form.contract_type.errors %} {{ error }} {%
+                    endfor %}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-group">
+                  {{ form.payment_method.label(class="form-label") }} {{
+                  form.payment_method(class="form-select" + (" is-invalid" if
+                  form.payment_method.errors else "")) }} {% if
+                  form.payment_method.errors %}
+                  <div class="invalid-feedback">
+                    {% for error in form.payment_method.errors %} {{ error }} {%
+                    endfor %}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <div class="d-grid mt-4">
+              {{ form.submit(class="btn btn-primary btn-lg") }}
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Prediction Result -->
+      {% if prediction_result %}
+      <div
+        class="prediction-result {{ 'churn' if prediction_result.prediction == 1 else 'no-churn' }}"
+      >
+        <div class="prediction-icon">
+          {% if prediction_result.prediction == 1 %}
+          <i class="fas fa-exclamation-triangle text-danger"></i>
+          {% else %}
+          <i class="fas fa-check-circle text-success"></i>
+          {% endif %}
+        </div>
+        <div class="prediction-text">
+          {% if prediction_result.prediction == 1 %} Customer is likely to CHURN
+          {% else %} Customer is NOT likely to churn {% endif %}
+        </div>
+        <div class="prediction-probability">
+          Churn Probability: {{ "%.1f"|format(prediction_result.probability *
+          100) }}%
+        </div>
+
+        <!-- Risk Score Badge -->
+        <div class="mt-2">
+          <span
+            class="badge"
+            style="font-size: 1rem; padding: 0.5rem 1rem;
+                        {% if prediction_result.risk_score >= 70 %}
+                            background-color: #dc2626;
+                        {% elif prediction_result.risk_score >= 40 %}
+                            background-color: #d97706;
+                        {% else %}
+                            background-color: #059669;
+                        {% endif %}
+                        color: white;"
+          >
+            Risk Score: {{ prediction_result.risk_score }}/100
+          </span>
+        </div>
+
+        <!-- Recommendation -->
+        <div class="mt-3">
+          <h6>Recommendation:</h6>
+          {% if prediction_result.prediction == 1 %}
+          <p class="mb-0">
+            <strong>High churn risk detected!</strong> Consider implementing
+            retention strategies such as: <br />• Personalized offers or
+            discounts <br />• Improved customer service outreach <br />•
+            Contract renegotiation <br />• Service upgrades or additional
+            benefits
+          </p>
+          {% else %}
+          <p class="mb-0">
+            <strong>Low churn risk.</strong> Customer appears satisfied.
+            Consider: <br />• Upselling opportunities <br />• Loyalty program
+            enrollment <br />• Regular satisfaction surveys <br />• Referral
+            incentives
+          </p>
+          {% endif %}
+        </div>
+
+        <!-- Email Sharing Section -->
+        <div class="mt-4 p-3" style="background-color: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+          <h6><i class="fas fa-envelope me-2"></i>Share Prediction Report</h6>
+          <p class="text-muted mb-3">Send this prediction report to stakeholders via email</p>
+          
+          <form method="POST" action="{{ url_for('main.send_prediction_email_route') }}" class="row g-3">
+            <input type="hidden" name="prediction_id" value="{{ prediction_result.prediction_id }}">
+            
+            <div class="col-md-6">
+              <label for="recipient_email" class="form-label">Recipient Email</label>
+              <input type="email" class="form-control" id="recipient_email" name="recipient_email" 
+                     placeholder="manager@company.com" required>
+            </div>
+            
+            <div class="col-md-6">
+              <label for="sender_name" class="form-label">Your Name</label>
+              <input type="text" class="form-control" id="sender_name" name="sender_name" 
+                     value="{{ current_user.username }}" placeholder="Your Name">
+            </div>
+            
+            <div class="col-12">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-paper-plane me-2"></i>Send Email Report
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Sample Data Helper -->
+      <div class="card mt-4">
+        <div class="card-body">
+          <h6 class="card-title">
+            <i class="fas fa-lightbulb me-2"></i>Sample Data
+          </h6>
+          <p class="card-text">
+            Try these sample values to test the prediction:
+          </p>
+          <div class="row">
+            <div class="col-md-6">
+              <strong>High Churn Risk:</strong><br />
+              Tenure: 2 months<br />
+              Monthly: $85<br />
+              Total: $170<br />
+              Contract: Month-to-month<br />
+              Payment: Electronic check
+            </div>
+            <div class="col-md-6">
+              <strong>Low Churn Risk:</strong><br />
+              Tenure: 36 months<br />
+              Monthly: $65<br />
+              Total: $2340<br />
+              Contract: Two year<br />
+              Payment: Credit card (automatic)
+            </div>
+          </div>
+          <div class="mt-3">
+            <button
+              class="btn btn-sm btn-outline-primary me-2"
+              onclick="fillSampleData('high')"
+            >
+              Fill High Risk Sample
+            </button>
+            <button
+              class="btn btn-sm btn-outline-success"
+              onclick="fillSampleData('low')"
+            >
+              Fill Low Risk Sample
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+  function fillSampleData(type) {
+    if (type === "high") {
+      document.getElementById("customer_name").value = "Rajesh Kumar";
+      document.getElementById("tenure").value = "2";
+      document.getElementById("monthly_charges").value = "3500";
+      document.getElementById("total_charges").value = "7000";
+      document.getElementById("contract_type").value = "Month-to-month";
+      document.getElementById("payment_method").value = "Electronic check";
+    } else if (type === "low") {
+      document.getElementById("customer_name").value = "Priya Sharma";
+      document.getElementById("tenure").value = "24";
+      document.getElementById("monthly_charges").value = "1200";
+      document.getElementById("total_charges").value = "28800";
+      document.getElementById("contract_type").value = "Two year";
+      document.getElementById("payment_method").value = "Digital Wallet";
+    }
+  }
+</script>
+{% endblock %}
