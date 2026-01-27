@@ -12,6 +12,9 @@ class Config:
     if os.environ.get('DATABASE_URL'):
         # Production database (PostgreSQL on Render)
         SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL').replace('postgres://', 'postgresql://')
+    elif os.environ.get('FLASK_ENV') == 'production':
+        # Production fallback - use in-memory SQLite (temporary)
+        SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
     else:
         # Development database (SQLite)
         db_path = os.path.join(os.path.dirname(__file__), 'instance', 'churn_app.db')
