@@ -36,5 +36,5 @@ class Config:
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER') or 'noreply@churnpredict.com'
     
     # Email Templates
-    COMPANY_NAME = "ChurnPredict India"
+    COMPANY_NAME = "ChurnPredictor"
     COMPANY_EMAIL = "support@churnpredict.com"
